@@ -7,6 +7,8 @@ import CustomSocialButton from '../../../components/forms/theme-elements/CustomS
 import { Avatar, Box, Stack } from '@mui/material';
 import useAuth from 'src/guards/authGuard/UseAuth';
 import { signInType } from 'src/types/auth/auth';
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+
 
 const AuthSocialButtons = ({ title }: signInType) => {
   const { loginWithGoogle, loginWithFaceBook } = useAuth();
@@ -19,13 +21,16 @@ const AuthSocialButtons = ({ title }: signInType) => {
     }
   };
 
-  const handleLoginFaceBook = async () => {
+  const handleLoginFaceBook = async (response:any) => {
+    console.log(response);
     try {
-      await loginWithFaceBook();
+      await loginWithFaceBook(response);
     } catch (error) {
       console.error(error);
     }
   };
+
+  
 
   return (
     <>
@@ -48,7 +53,12 @@ const AuthSocialButtons = ({ title }: signInType) => {
           </Box>{' '}
           Google
         </CustomSocialButton>
-        <CustomSocialButton onClick={handleLoginFaceBook}>
+        <FacebookLogin
+        appId="1018982909212326"
+        autoLoad={false}
+        callback={handleLoginFaceBook}
+        render={(renderProps:any) => (
+        <CustomSocialButton onClick={renderProps.onClick} title="Facebook" icon={icon2}>
           <Avatar
             src={icon2}
             alt={icon2}
@@ -62,10 +72,11 @@ const AuthSocialButtons = ({ title }: signInType) => {
           <Box
             sx={{ display: { xs: 'none', sm: 'flex' }, whiteSpace: 'nowrap', mr: { sm: '3px' } }}
           >
-            {title}
-          </Box>{' '}
-          FB
+            Sign in with Facebook
+          </Box>
         </CustomSocialButton>
+      )}
+    />
       </Stack>
     </>
   );

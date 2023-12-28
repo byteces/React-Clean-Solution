@@ -198,13 +198,66 @@ export const AuthProvider = ({ children }: { children: React.ReactElement }) => 
     }
   };
 
+  const handleFacebookLogin = async (tokenResponse: any) => {
+    setError(null);
+    console.log(tokenResponse);
+  
+    const access_token = tokenResponse;
+  
+    if (access_token) {
+      try {
+        // Make a request to your server for Facebook login
+        const response = await axios.post<SignInResponse>(
+          `${urlAuth}/facebook-login`,
+          { accessToken: access_token },
+        );
+  
+        if (!response.data.isSuccess) {
+          console.log(response.data.error);
+          setError(response.data.error);
+          return;
+        }
+  
+        const token = response.data.data.token;
+  
+        if (!token) return;
+  
+        localStorage.setItem('authToken', token);
+        const decodedToken = decodeToken(token);
+  
+        dispatch({
+          type: 'AUTH_STATE_CHANGED',
+          payload: {
+            isAuthenticated: true,
+            user: {
+              email: decodedToken.email,
+              tokenExp: decodedToken.tokenExp,
+              // Include other user properties as needed
+            },
+          },
+        });
+      } catch (error) {
+        console.error('Error logging in with Facebook:', error);
+        setError('An error occurred during Facebook login.');
+      }
+    }
+  };
+
+
+  // Login with FB
+  const loginWithFaceBook = async (response: any) => {
+    // Extract the access token from the response
+    const { accessToken } = response;
+  
+    // Now you can use the accessToken as needed
+    await handleFacebookLogin(accessToken);
+  };
+  
+
   // Login with Google
   const loginWithGoogle = useGoogleLogin({
     onSuccess: (tokenResponse: any) => hanldeGoogleLogin(tokenResponse),
   });
-
-  // Login with FB
-  const loginWithFaceBook = () => {};
 
   return (
     <AuthContext.Provider
