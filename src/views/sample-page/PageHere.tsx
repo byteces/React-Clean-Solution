@@ -17,23 +17,19 @@ const BCrumb = [
   },
 ];
 
-const SamplePage = () => {
+const PageHere = () => {
   const { user } = useAuth();
 
   return (
     <PageContainer title="Sample Page" description="this is Sample page">
       {/* breadcrumb */}
-      <Breadcrumb title="Sample Page" items={BCrumb} />
+      <Breadcrumb title="Sample Pafsgea" items={BCrumb} />
       {/* end breadcrumb */}
       <DashboardCard title="Sample Page">
-        {user && user.decodedToken.uid ? (
-          <Typography>Hi {user.decodedToken.uid}</Typography>
-        ) : (
-          <Typography>Loading...</Typography>
-        )}
+        <Typography>Hi {user.uid}</Typography>
       </DashboardCard>
     </PageContainer>
   );
 };
 
-export default SamplePage;
+export default PageHere;

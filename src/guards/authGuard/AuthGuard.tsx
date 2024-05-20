@@ -1,18 +1,19 @@
-import { useNavigate } from 'react-router-dom';
-import useAuth from './UseAuth';
-import { useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import useAuth from "./UseAuth";
+import { useEffect } from "react";
+import Spinner from "src/views/spinner/Spinner";
 
 const AuthGuard = ({ children }: any) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth/login', { replace: true });
+    if (!isLoading && !isAuthenticated) {
+      navigate("/auth/login", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
-  return children;
+  return isLoading ? <Spinner /> : children; // 如果正在加载，则显示加载指示器
 };
 
 export default AuthGuard;

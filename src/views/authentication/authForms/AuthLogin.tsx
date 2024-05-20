@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -10,43 +10,55 @@ import {
   Stack,
   Divider,
   Alert,
-} from '@mui/material';
-import { Link } from 'react-router-dom';
+  AlertTitle,
+} from "@mui/material";
+import { Link } from "react-router-dom";
 
-import { loginType } from 'src/types/auth/auth';
-import CustomCheckbox from 'src/components/forms/theme-elements/CustomCheckbox';
-import CustomTextField from 'src/components/forms/theme-elements/CustomTextField';
-import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
-import AuthSocialButtons from './AuthSocialButtons';
-import { Form, useFormik, FormikProvider } from 'formik';
-import * as Yup from 'yup';
-import useAuth from 'src/guards/authGuard/UseAuth';
-import useMounted from 'src/guards/authGuard/UseMounted';
+import { loginType } from "src/types/auth/auth";
+import CustomCheckbox from "src/components/forms/theme-elements/CustomCheckbox";
+import CustomTextField from "src/components/forms/theme-elements/CustomTextField";
+import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
+import AuthSocialButtons from "./AuthSocialButtons";
+import { Form, useFormik, FormikProvider } from "formik";
+import * as Yup from "yup";
+import useAuth from "src/guards/authGuard/UseAuth";
+import useMounted from "src/guards/authGuard/UseMounted";
 
-const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
+const AuthLogin = ({ title, subtitle, subtext, setEmail }: loginType) => {
   const mounted = useMounted();
-  const { signin, error } = useAuth();
+  const {
+    signin,
+    error,
+    resetPasswordRedirect,
+    closeResetPasswordResultMessage,
+    emailConfirmation,
+  } = useAuth();
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().email('Email is invalid').required('Email is required'),
+    email: Yup.string().email("Email is invalid").required("Email is required"),
     password: Yup.string()
-      .min(6, 'Password must be at least 6 characters')
-      .required('Password is required'),
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
   });
 
   const formik = useFormik({
     initialValues: {
-      email: 'user@example.com',
-      password: 'Axz223!',
+      email: "user@example.com",
+      password: "Axz223!",
       submit: null,
     },
 
     validationSchema: LoginSchema,
 
     onSubmit: async (values, { setErrors, setStatus, setSubmitting }) => {
+      setSubmitting(true);
       await signin(values.email, values.password);
 
       if (!error) {
+        if (emailConfirmation == false) {
+          setEmail(values.email);
+          return;
+        }
         setStatus({ success: true });
         setSubmitting(true);
       }
@@ -54,7 +66,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
   });
 
   useEffect(() => {
-    if (error !== null) {
+    if (error) {
       // Handle the error
       formik.setStatus({ success: false });
       formik.setErrors({ submit: error });
@@ -83,12 +95,39 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
             variant="h6"
             fontWeight="400"
             position="relative"
-            px={2}
-          >
+            px={2}>
             or sign in with
           </Typography>
         </Divider>
       </Box>
+
+      {resetPasswordRedirect === true ? (
+        <Box mt={2}>
+          <Alert
+            variant="filled"
+            onClose={closeResetPasswordResultMessage}
+            severity="success">
+            <AlertTitle>Success</AlertTitle>
+            Password Reset Successful! —{" "}
+            <strong>You can now log in with your new password.</strong>
+          </Alert>
+        </Box>
+      ) : resetPasswordRedirect === false ? (
+        <Box mt={2}>
+          <Alert
+            variant="filled"
+            severity="error"
+            onClose={closeResetPasswordResultMessage}>
+            <AlertTitle>Error</AlertTitle>
+            Oops! —{" "}
+            <strong>
+              Something went wrong. Unable to reset your password. Please try
+              again later.
+            </strong>
+          </Alert>
+        </Box>
+      ) : null}
+
       {errors.submit && (
         <Box mt={2}>
           <Alert severity="error">{errors.submit}</Alert>
@@ -103,7 +142,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
                 id="email"
                 variant="outlined"
                 fullWidth
-                {...getFieldProps('email')}
+                {...getFieldProps("email")}
                 error={Boolean(touched.email && errors.email)}
                 helperText={touched.email && errors.email}
               />
@@ -115,12 +154,16 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
                 type="password"
                 variant="outlined"
                 fullWidth
-                {...getFieldProps('password')}
+                {...getFieldProps("password")}
                 error={Boolean(touched.password && errors.password)}
                 helperText={touched.password && errors.password}
               />
             </Box>
-            <Stack justifyContent="space-between" direction="row" alignItems="center" my={2}>
+            <Stack
+              justifyContent="space-between"
+              direction="row"
+              alignItems="center"
+              my={2}>
               <FormGroup>
                 <FormControlLabel
                   control={<CustomCheckbox defaultChecked />}
@@ -129,13 +172,12 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
               </FormGroup>
               <Typography
                 component={Link}
-                to="/auth/reset-password"
+                to="/auth/forgot-password"
                 fontWeight="500"
                 sx={{
-                  textDecoration: 'none',
-                  color: 'primary.main',
-                }}
-              >
+                  textDecoration: "none",
+                  color: "primary.main",
+                }}>
                 Forgot Password ?
               </Typography>
             </Stack>
@@ -147,8 +189,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
               size="large"
               fullWidth
               type="submit"
-              disabled={isSubmitting}
-            >
+              disabled={isSubmitting}>
               Sign In
             </Button>
           </Box>

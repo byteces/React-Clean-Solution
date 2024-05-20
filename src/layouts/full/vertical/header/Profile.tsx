@@ -1,23 +1,31 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import React, { useState } from 'react';
-import { Box, Menu, Avatar, Typography, Divider, Button, IconButton } from '@mui/material';
-import * as dropdownData from './data';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import {
+  Box,
+  Menu,
+  Avatar,
+  Typography,
+  Divider,
+  Button,
+  IconButton,
+} from "@mui/material";
+import * as dropdownData from "./data";
+import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { IconMail } from '@tabler/icons-react';
-import { Stack } from '@mui/system';
+import { IconMail } from "@tabler/icons-react";
+import { Stack } from "@mui/system";
 
-import ProfileImg from 'src/assets/images/profile/user-1.jpg';
-import unlimitedImg from 'src/assets/images/backgrounds/unlimited-bg.png';
-import useMounted from 'src/guards/authGuard/UseMounted';
-import useAuth from 'src/guards/authGuard/UseAuth';
+import ProfileImg from "src/assets/images/profile/user-1.jpg";
+import unlimitedImg from "src/assets/images/backgrounds/unlimited-bg.png";
+import useMounted from "src/guards/authGuard/UseMounted";
+import useAuth from "src/guards/authGuard/UseAuth";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
   const mounted = useMounted();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleClick2 = (event: any) => {
@@ -30,7 +38,7 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      navigate("/");
       if (mounted.current) {
         handleClose2();
       }
@@ -48,15 +56,14 @@ const Profile = () => {
         aria-controls="msgs-menu"
         aria-haspopup="true"
         sx={{
-          ...(typeof anchorEl2 === 'object' && {
-            color: 'primary.main',
+          ...(typeof anchorEl2 === "object" && {
+            color: "primary.main",
           }),
         }}
-        onClick={handleClick2}
-      >
+        onClick={handleClick2}>
         <Avatar
-          src={ProfileImg}
-          alt={ProfileImg}
+          src={user.decodedToken.profilePictureURL}
+          alt={user.decodedToken.profilePictureURL}
           sx={{
             width: 35,
             height: 35,
@@ -72,34 +79,39 @@ const Profile = () => {
         keepMounted
         open={Boolean(anchorEl2)}
         onClose={handleClose2}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
         sx={{
-          '& .MuiMenu-paper': {
-            width: '360px',
+          "& .MuiMenu-paper": {
+            width: "360px",
             p: 4,
           },
-        }}
-      >
+        }}>
         <Typography variant="h5">User Profile</Typography>
         <Stack direction="row" py={3} spacing={2} alignItems="center">
-          <Avatar src={ProfileImg} alt={ProfileImg} sx={{ width: 95, height: 95 }} />
+          <Avatar
+            src={user.decodedToken.profilePictureURL}
+            alt={user.decodedToken.profilePictureURL}
+            sx={{ width: 95, height: 95 }}
+          />
           <Box>
-            <Typography variant="subtitle2" color="textPrimary" fontWeight={600}>
-              Mathew Anderson
+            <Typography
+              variant="subtitle2"
+              color="textPrimary"
+              fontWeight={600}>
+              {user.decodedToken.name}
             </Typography>
-            <Typography variant="subtitle2" color="textSecondary">
-             Designer
-            </Typography>
+            {/* <Typography variant="subtitle2" color="textSecondary">
+              Designer
+            </Typography> */}
             <Typography
               variant="subtitle2"
               color="textSecondary"
               display="flex"
               alignItems="center"
-              gap={1}
-            >
+              gap={1}>
               <IconMail width={15} height={15} />
-              info@modernize.com
+              {user.decodedToken.email}
             </Typography>
           </Box>
         </Stack>
@@ -115,8 +127,7 @@ const Profile = () => {
                     bgcolor="primary.light"
                     display="flex"
                     alignItems="center"
-                    justifyContent="center"
-                  >
+                    justifyContent="center">
                     <Avatar
                       src={profile.icon}
                       alt={profile.icon}
@@ -135,19 +146,17 @@ const Profile = () => {
                       className="text-hover"
                       noWrap
                       sx={{
-                        width: '240px',
-                      }}
-                    >
+                        width: "240px",
+                      }}>
                       {profile.title}
                     </Typography>
                     <Typography
                       color="textSecondary"
                       variant="subtitle2"
                       sx={{
-                        width: '240px',
+                        width: "240px",
                       }}
-                      noWrap
-                    >
+                      noWrap>
                       {profile.subtitle}
                     </Typography>
                   </Box>
@@ -157,7 +166,12 @@ const Profile = () => {
           </Box>
         ))}
         <Box mt={2}>
-          <Box bgcolor="primary.light" p={3} mb={3} overflow="hidden" position="relative">
+          <Box
+            bgcolor="primary.light"
+            p={3}
+            mb={3}
+            overflow="hidden"
+            position="relative">
             <Box display="flex" justifyContent="space-between">
               <Box>
                 <Typography variant="h5" mb={2}>
@@ -168,10 +182,17 @@ const Profile = () => {
                   Upgrade
                 </Button>
               </Box>
-              <img src={unlimitedImg} alt="unlimited" className="signup-bg"></img>
+              <img
+                src={unlimitedImg}
+                alt="unlimited"
+                className="signup-bg"></img>
             </Box>
           </Box>
-          <Button variant="outlined" color="primary" fullWidth onClick={handleLogout}>
+          <Button
+            variant="outlined"
+            color="primary"
+            fullWidth
+            onClick={handleLogout}>
             Logout
           </Button>
         </Box>

@@ -15,7 +15,7 @@ import useAuth from 'src/guards/authGuard/UseAuth';
 import useMounted from 'src/guards/authGuard/UseMounted';
 import { registerDTO } from 'src/guards/identity/IdentityType';
 
-const AuthRegister = ({ title, subtitle, subtext }: registerType) => {
+const AuthRegister = ({ title, subtitle, subtext, needVerify }: registerType) => {
   const { signup, error } = useAuth();
 
   const registerSchema = Yup.object().shape({
@@ -50,7 +50,7 @@ const AuthRegister = ({ title, subtitle, subtext }: registerType) => {
       };
       setSubmitting(true);
 
-      await signup(signUpValue);
+      await signup(signUpValue, needVerify);
 
       if (!error) {
         setStatus({ success: true });
