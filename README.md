@@ -1,6 +1,6 @@
 # Project Name
 
-Short project description or tagline.
+A project that provides a clean architecture setup for building applications with React and ASP.NET Core Web API.
 
 ## Table of Contents
 
