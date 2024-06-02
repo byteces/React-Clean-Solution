@@ -16,7 +16,10 @@ Explain briefly what the project is about and its purpose.
 
 ## Installation
 
-Describe how to install the project and its dependencies.
+```
+npm install
+npm run dev
+```
 
 ## Usage
 
